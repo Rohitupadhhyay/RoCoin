@@ -19,7 +19,7 @@ class BlockChain {
       console.error("The incoming chain is not longer");
       return;
     }
-    if (!BlockChain.isValidate(chain)) {
+    if (!BlockChain.isValidChain(chain)) {
       console.error("The incoming chain is not valid");
       return;
     }
@@ -31,12 +31,20 @@ class BlockChain {
     }
 
     for (let i = 1; i < chain.length; i++) {
-      const { timestamp, prevHash, hash, data } = chain[i];
+      const { timestamp, prevHash, nonce, difficulty, data, hash } = chain[i];
+      const lastDifficulty = chain[i - 1].difficulty;
       const realLastHash = chain[i - 1].hash;
       if (prevHash !== realLastHash) return false;
 
-      const validatedhash = cryptoHash(timestamp, prevHash, data);
+      const validatedhash = cryptoHash(
+        timestamp,
+        prevHash,
+        nonce,
+        difficulty,
+        data
+      );
       if (hash !== validatedhash) return false;
+      if (Math.abs(lastDifficulty - difficulty) > 1) return false;
     }
     return true;
   }
